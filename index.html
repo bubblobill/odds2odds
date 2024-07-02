@@ -6,47 +6,44 @@
     <title></title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css" />
-</head>
-<script>
-    function setThemeClass() {
-        document.documentElement.className = Telegram.WebApp.colorScheme;
-    }
-    Telegram.WebApp.onEvent('themeChanged', setThemeClass);
-    setThemeClass();
-</script>
+    <script>
+        function setThemeClass() {
+            document.documentElement.className = Telegram.WebApp.colorScheme;
+        }
+        Telegram.WebApp.onEvent('themeChanged', setThemeClass);
+        setThemeClass();
+    </script>
 </head>
 <body>
 <form id="fm">
-<section  class="viewport-container">
-        <div class="input-container flex2">
-            <div>
-                <label class="locale" for="us-odds">
-                    <img src="img/us.svg" alt="🇺🇸">
-                </label>
-                <input type="number" class="numberInput" id="us-odds" value="100" step="10">
-            </div>
-            <div>
-                <label class="locale" for="dec-odds">
-                    <img src="img/earthGlobe.svg" alt="🌏">
-                </label>
-                <input type="number" class="numberInput" id="dec-odds" value="1.00" step="0.1">
-            </div>
+<section id="viewport-container" class="viewport-container">
+    <div class="grid-container">
+        <div id="usOdds">
+            <label class="locale" for="us-odds">
+                <img src="img/us.svg" alt="🇺🇸">
+            </label>
+            <input type="number" class="numberInput" id="us-odds" value="100" step="10">
         </div>
-        <div class="button-container flex2">
-            <input form="fm" type="reset" id="clear" class="button clear_btn" value="&#x21bb;" />
-            <button id="close" class="button close_btn" >&#10006;</button>
+        <div id="decOdds">
+            <label class="locale" for="dec-odds">
+                <img src="img/earthGlobe.svg" alt="🌏">
+            </label>
+            <input type="number" class="numberInput" id="dec-odds" value="2.00" step="0.1">
         </div>
-    </form>
+        <input form="fm" type="reset" id="clear" class="button clear_btn" value="&#x21bb;" />
+        <input id="slider" type="range" min="1" max="5" value="2" step="0.01">
+    </div>
 </section>
+</form>
 <script>
     const usOdds = document.getElementById("us-odds");
     const dOdds = document.getElementById("dec-odds");
-
+    const slider = document.getElementById("slider");
     window.addEventListener("load", function(){
         usOdds.addEventListener("input", inputHandler);
         dOdds.addEventListener("input", inputHandler);
-        document.getElementById("close").addEventListener("click", DemoApp.close);
-
+        slider.addEventListener("input", inputHandler);
+        window.resizeTo(window.innerWidth, 100);
     });
     function inputHandler(e){
         const t = e.target;
@@ -59,12 +56,17 @@
                 return;
             }
             dOdds.value = usToDec(t.value);
+            slider.value = dOdds.value;
             return;
-        } else {
+        } else if(t==decOdds) {
             if(t.value == 0){
                 return;
             }
             usOdds.value = decToUs(t.value);
+            slider.value = t.value;
+        } else {
+            usOdds.value = t.value == 1 ? 5000 : decToUs(t.value);
+            dOdds.value = t.value;
         }
     }
 
@@ -107,7 +109,6 @@
             Telegram.WebApp.expand();
         },
         close() {
-        console.log("close");
             Telegram.WebApp.close();
         },
         toggleMainButton(el) {
@@ -152,8 +153,6 @@
     const DemoAppMenu = {
         init() {
             DemoApp.init();
-            document.body.classList.add('gray');
-            Telegram.WebApp.setHeaderColor('secondary_bg_color');
         }
     };
 
@@ -201,12 +200,9 @@
     /*
      * This part of code is used to initialize the demo app and set up the event handlers we need.
      */
-
     Telegram.WebApp.onEvent('themeChanged', function () {
-        document.body.setAttribute('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
+        document.getElementById("viewport-container").setAttribute('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
     });
-
-
     DemoApp.init();
 </script>
 </body>
