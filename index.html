@@ -20,73 +20,79 @@
     <div class="grid-container">
         <div id="usOdds">
             <label class="locale" for="us-odds">
-                <img src="img/us.svg" alt="🇺🇸">
+                <img class="flag" src="img/us.svg" alt="🇺🇸">
             </label>
-            <input type="number" class="numberInput" id="us-odds" value="100" step="10">
+            <input type="number" class="numberInput" id="us-odds" value="-550" step="10">
         </div>
         <div id="decOdds">
             <label class="locale" for="dec-odds">
-                <img src="img/earthGlobe.svg" alt="🌏">
+                <img class="flag" src="img/earthGlobe.svg" alt="🌏">
             </label>
-            <input type="number" class="numberInput" id="dec-odds" value="2.00" step="0.1">
+            <input type="number" class="numberInput" id="dec-odds" value="1.18" step="0.1">
         </div>
         <input form="fm" type="reset" id="clear" class="button clear_btn" value="&#x21bb;" />
         <input id="slider" type="range" min="1" max="5" value="2" step="0.01">
     </div>
 </section>
-</form>
-<script>
-    const usOdds = document.getElementById("us-odds");
-    const dOdds = document.getElementById("dec-odds");
-    const slider = document.getElementById("slider");
-    window.addEventListener("load", function(){
-        usOdds.addEventListener("input", inputHandler);
-        dOdds.addEventListener("input", inputHandler);
-        slider.addEventListener("input", inputHandler);
-        window.resizeTo(window.innerWidth, 100);
-    });
-    function inputHandler(e){
-        const t = e.target;
-        if(t != document.activeElement){
-            return;
-        };
-        if(t==usOdds){
-            if(t.value > -100 && t.value < 100){
-                t.value = Math.sign(t.value) * -100;
+    <script>
+        const usOdds = document.getElementById("us-odds");
+        const dOdds = document.getElementById("dec-odds");
+        const slider = document.getElementById("slider");
+        window.addEventListener("load", function(){
+            usOdds.addEventListener("input", inputHandler);
+            dOdds.addEventListener("input", inputHandler);
+            slider.addEventListener("input", inputHandler);
+            window.resizeTo(window.innerWidth, 100);
+        });
+        function inputHandler(e){
+            const t = e.target;
+            if(t != document.activeElement){
                 return;
-            }
-            dOdds.value = usToDec(t.value);
-            slider.value = dOdds.value;
-            return;
-        } else if(t==decOdds) {
-            if(t.value == 0){
+            };
+            if(t==usOdds){
+                if(t.value > -100 && t.value < 100){
+                    if(!e.inputType.startsWith("delete") && !e.inputType.startsWith("insert")){
+                        t.value = Math.sign(t.value) * -100;
+                    } else {
+                        dOdds.classList.add("grey");
+                    }
+                    return;
+                } else if(dOdds.classList.contains("grey")){
+                    dOdds.classList.remove("grey");
+                }
+                dOdds.value = parseFloat(usToDec(t.value)).toFixed(2);
+                slider.value = dOdds.value;
                 return;
+            } else if(t==decOdds) {
+                if(t.value == 0){
+                    return;
+                }
+                usOdds.value = decToUs(t.value);
+                slider.value = t.value;
+            } else {
+                usOdds.value = t.value == 1 ? 5000 : decToUs(t.value);
+                dOdds.value = parseFloat(t.value).toFixed(2);
             }
-            usOdds.value = decToUs(t.value);
-            slider.value = t.value;
-        } else {
-            usOdds.value = t.value == 1 ? 5000 : decToUs(t.value);
-            dOdds.value = t.value;
         }
-    }
 
-    function decToUs(dec){
-        if(dec == 2){
-            return 100;
-        } else if(dec > 2){
-            return Math.round((dec - 1) * 100);
-        } else {
-            return Math.round(-100 / (dec - 1));
+        function decToUs(dec){
+            if(dec == 2){
+                return 100;
+            } else if(dec > 2){
+                return Math.round((dec - 1) * 100);
+            } else {
+                return Math.round(-100 / (dec - 1));
+            }
         }
-    }
-    function usToDec(us){
-        if(Math.sign(us) == 1){
-            return (1+us/100).toFixed(2);
-        } else {
-            return (1-100/us).toFixed(2);
+        function usToDec(us){
+            if(Math.sign(us) == 1){
+                return (1+us/100).toFixed(2);
+            } else {
+                return (1-100/us).toFixed(2);
+            }
         }
-    }
-</script>
+    </script>
+</form>
 <script type="application/javascript">
     /*
      * This is a demo code for Telegram WebApp for Bots
