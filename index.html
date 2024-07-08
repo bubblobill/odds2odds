@@ -22,7 +22,7 @@
             <label class="locale" for="dec-odds">
                 <img class="flag" src="img/earthGlobe.svg" alt="🌏">
             </label>
-            <input type="number" class="numberInput" id="dec-odds" value="1.18" step="0.1">
+            <input type="number" class="numberInput" id="dec-odds" value="1.18" step="0.01">
         </div>
         <input form="fm" type="reset" id="clear" class="button clear_btn" value="&#x21bb;" />
         <input id="slider" type="range" min="1" max="5" value="2" step="0.01">
@@ -38,17 +38,12 @@ window.addEventListener("load", function(){
     dOdds.addEventListener("input", inputHandler);
     slider.addEventListener("input", inputHandler);
     slider.addEventListener("change", inputHandler);
-    slider.addEventListener("touchStart", function(){
+    slider.addEventListener("touchStart", function(e){
         slider.activate;
     });
 });
-function spinnerHandler(e){
-    console.log(e);
-}
+
 function inputHandler(e){
-    if(e.srcElement.computedRole == "spinbutton" && e.type ==="touchstart"){
-        spinnerHandler(e);
-    };
     const t = e.target;
     if(t==usOdds){
         if(t.value > -100 && t.value < 100){
@@ -56,10 +51,9 @@ function inputHandler(e){
                 t.value = Math.sign(t.value) * -100;
             } else {
                 dOdds.classList.add("grey");
+                t.classList.add("invalid");
             }
             return;
-        } else if(dOdds.classList.contains("grey")){
-            dOdds.classList.remove("grey");
         }
         dOdds.value = parseFloat(usToDec(t.value)).toFixed(2);
         slider.value = dOdds.value;
@@ -73,6 +67,10 @@ function inputHandler(e){
     } else {
         usOdds.value = t.value == 1 ? 5000 : decToUs(t.value);
         dOdds.value = parseFloat(t.value).toFixed(2);
+    }
+    if(dOdds.classList.contains("grey")){
+        dOdds.classList.remove("grey");
+        usOdds.classList.remove("invalid");
     }
 }
 
