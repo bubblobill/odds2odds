@@ -108,6 +108,7 @@ label {
     position: absolute;
     transition: height .2s ease;
     width: 100%;
+    scroll-margin-bottom: 48px;
 }
 #usOdds {grid-area: usOdds;}
 #decOdds {grid-area: decOdds;}
