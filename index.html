@@ -41,6 +41,7 @@ window.addEventListener("load", function(){
     slider.addEventListener("touchStart", function(e){
         slider.activate;
     });
+    document.getElementById("viewport-container").scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
 });
 
 function inputHandler(e){
