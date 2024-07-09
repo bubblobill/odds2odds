@@ -25,11 +25,12 @@
             <input type="number" class="numberInput" id="dec-odds" value="1.18" step="0.01">
         </div>
         <input form="fm" type="reset" id="clear" class="button clear_btn" value="&#x21bb;" />
-        <input id="slider" type="range" min="1" max="5" value="2" step="0.01">
+        <input id="slider" type="range" min="1" max="5" value="1.18" step="0.01">
     </div>
 </section>
 </form>
 <script type="application/javascript">
+    const startValue = 1.18;
 const usOdds = document.getElementById("us-odds");
 const dOdds = document.getElementById("dec-odds");
 const slider = document.getElementById("slider");
@@ -41,41 +42,65 @@ window.addEventListener("load", function(){
     slider.addEventListener("touchStart", function(e){
         slider.activate;
     });
-    slider.value = 1.18;
+    slider.value = startValue;
     usOdds.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
     slider.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
-    document.getElementById("viewport-container").scrollIntoView({ behavior: "smooth", block: "bottom", inline: "nearest" });
-
+    document.getElementById("clear").addEventListener("pointerdown", inputHandler);
+    document.getElementById("viewport-container").scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
 });
 
 function inputHandler(e){
     const t = e.target;
+    var good = false;
     if(t==usOdds){
         if(t.value > -100 && t.value < 100){
-            if(!e.inputType.startsWith("delete") && !e.inputType.startsWith("insert")){
-                t.value = Math.sign(t.value) * -100;
-            } else {
-                dOdds.classList.add("grey");
-                t.classList.add("invalid");
-            }
-            return;
+            invalidToggle(usOdds, true);
+            greyToggle(dOdds, true);
+        } else {
+            good = true;
+            dOdds.value = parseFloat(usToDec(t.value)).toFixed(2);
+            slider.value = dOdds.value;
         }
-        dOdds.value = parseFloat(usToDec(t.value)).toFixed(2);
-        slider.value = dOdds.value;
-        return;
-    } else if(t==decOdds) {
-        if(t.value == 0){
-            return;
+    } else if(t==dOdds || t==slider) {
+        if(t.value <= 0){
+            invalidToggle(dOdds, true);
+            greyToggle(usOdds, true);
+        } else if(t.value == 1){
+            usOdds.value = -5000;
+            invalidToggle(usOdds, true);
+            greyToggle(usOdds, true);
+            if(t==slider){dOdds.value = parseFloat(1).toFixed(2); }
+        } else if(t==dOdds){
+            usOdds.value = decToUs(t.value);
+            slider.value = t.value;
+            good = true;
+        } else {
+            usOdds.value = decToUs(t.value);
+            dOdds.value = parseFloat(t.value).toFixed(2);
+            good = true;
         }
-        usOdds.value = decToUs(t.value);
-        slider.value = t.value;
     } else {
-        usOdds.value = t.value == 1 ? 5000 : decToUs(t.value);
-        dOdds.value = parseFloat(t.value).toFixed(2);
+        good = true;
     }
-    if(dOdds.classList.contains("grey")){
-        dOdds.classList.remove("grey");
-        usOdds.classList.remove("invalid");
+    if(good){
+        invalidToggle(usOdds, false);
+        greyToggle(usOdds, false);
+        invalidToggle(dOdds, false);
+        greyToggle(dOdds, false);
+    }
+    function invalidToggle(el, state){
+        if(state && !el.classList.contains("invalid")){
+            el.classList.add("invalid");
+        } else if(!state && el.classList.contains("invalid")){
+            el.classList.remove("invalid");
+        }
+    }
+    function greyToggle(el, state){
+        if(state && !el.classList.contains("grey")){
+            el.classList.add("grey");
+        } else if(!state && el.classList.contains("grey")){
+            el.classList.remove("grey");
+        }
     }
 }
 
